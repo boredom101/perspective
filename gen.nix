@@ -1,10 +1,10 @@
-{ src, type, unit, stdenv, lib, framework }:
+{ src, type, unit, stdenv, lib, framework, factor }:
 
 let
     templatify = set: file:
         builtins.replaceStrings
             (map (x: "@${x}@") (builtins.attrNames set))
-            (builtins.attrValues set)
+            (map builtins.toString (builtins.attrValues set))
             (builtins.readFile file);
     capitalize = s:
         (lib.toUpper (builtins.substring 0 1 s)) +
@@ -19,7 +19,7 @@ stdenv.mkDerivation {
         ${templatify {unit = unit; type = capitalize type;} "${framework}/index.html"}
         HEREDOC
         cat <<HEREDOC > script.js
-        ${templatify {dataset = builtins.readFile "${src}/data.json";} "${framework}/script.js"}
+        ${templatify {dataset = builtins.readFile "${src}/data.json"; factor = factor;} "${framework}/script.js"}
         HEREDOC
     '';
     installPhase = ''
