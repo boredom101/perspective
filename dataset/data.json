@@ -10,11 +10,6 @@
         "object":"London bus"
     },
     {
-        "value":133,
-        "type":"length",
-        "object":"longest-known blue whale"
-    },
-    {
         "value":52,
         "type":"height",
         "object":"Niagra Falls"
@@ -28,6 +23,11 @@
         "value":105,
         "type":"length",
         "object":"football field"
+    },
+    {
+        "value":133,
+        "type":"length",
+        "object":"longest-known blue whale"
     },
     {
         "value":147,

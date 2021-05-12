@@ -1,4 +1,4 @@
-{ src, type, unit, stdenv, lib, framework, factor }:
+{ src, mode, type, unit, stdenv, lib, framework, factor, closeness }:
 
 let
     templatify = set: file:
@@ -12,20 +12,32 @@ let
 
 in
 stdenv.mkDerivation {
-    name = "perspective-${type}";
+    name = "perspective-${mode}-${type}";
     src = src;
     buildPhase = ''
+        cat <<HEREDOC > lib.js
+            ${templatify {
+                dataset = builtins.readFile "${src}/data.json";
+                factor = factor; closeness = closeness;
+            } "${framework}/lib.js"}
+        HEREDOC
+    '' +
+    (if mode == "webapp" then
+    ''
         cat <<HEREDOC > index.html
         ${templatify {unit = unit; type = capitalize type;} "${framework}/index.html"}
         HEREDOC
-        cat <<HEREDOC > script.js
-        ${templatify {dataset = builtins.readFile "${src}/data.json"; factor = factor;} "${framework}/script.js"}
-        HEREDOC
-    '';
+    ''
+    else "");
     installPhase = ''
         mkdir -p $out
-        cp index.html $out
+        cp lib.js $out
+    '' +
+    (if mode == "webapp" then
+    ''
+        cp ${framework}/script.js $out
         cp ${framework}/style.css $out
-        cp script.js $out
-    '';
+        cp index.html $out
+    ''
+    else "");
 }
